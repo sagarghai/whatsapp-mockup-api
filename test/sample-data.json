@@ -1,0 +1,49 @@
+{
+  "astrologerName": "Guru Acharya",
+  "messages": [
+    {
+      "role": "user",
+      "text": "Hello, I wanted to ask about my career prospects this year"
+    },
+    {
+      "role": "astrologer", 
+      "text": "Namaste! I'd be happy to help you with your career reading. Can you please share your birth details - date, time, and place of birth?"
+    },
+    {
+      "role": "user",
+      "text": "I was born on March 15, 1990 at 2:30 PM in Mumbai"
+    },
+    {
+      "role": "astrologer",
+      "text": "Thank you for the details. Based on your birth chart, I can see that Jupiter is transiting through your 10th house of career this year, which is very auspicious! ✨"
+    },
+    {
+      "role": "astrologer",
+      "text": "This indicates significant growth and new opportunities in your professional life. The period between June and September looks particularly favorable for career advancement."
+    },
+    {
+      "role": "user", 
+      "text": "That's wonderful to hear! Should I consider changing jobs this year?"
+    },
+    {
+      "role": "astrologer",
+      "text": "The stars suggest that mid-July to August would be an excellent time for job transitions. Mars in your 2nd house will boost your confidence during interviews. However, avoid making major career decisions during Mercury retrograde periods."
+    },
+    {
+      "role": "user",
+      "text": "When are the Mercury retrograde periods this year?"
+    },
+    {
+      "role": "astrologer", 
+      "text": "Mercury will be retrograde from April 21-May 14, August 23-September 15, and December 13-January 1. Plan your career moves around these dates for best results. 🌟"
+    },
+    {
+      "role": "user",
+      "text": "Thank you so much for this guidance! This gives me a lot of clarity."
+    },
+    {
+      "role": "astrologer",
+      "text": "You're most welcome! May the cosmic energies guide you toward success and prosperity. Feel free to reach out if you need any further guidance. Blessings! 🙏"
+    }
+  ]
+}
