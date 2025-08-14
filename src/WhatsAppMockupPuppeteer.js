@@ -486,59 +486,58 @@ class WhatsAppMockupPuppeteer {
 
   async createVideoFromFrames(framesDir, outputPath) {
     return new Promise((resolve, reject) => {
+      console.log(`Creating video from frames in ${framesDir}`);
+      
       ffmpeg()
         .input(`${framesDir}/frame-%06d.png`)
         .inputOptions(['-framerate', this.fps.toString()])
         .videoCodec('libx264')
         .outputOptions([
           '-pix_fmt', 'yuv420p',
-          '-crf', '23'
+          '-crf', '23',
+          '-movflags', '+faststart' // Optimize for web playback
         ])
         .output(outputPath)
-        .on('end', () => resolve(outputPath))
-        .on('error', reject)
+        .on('start', (commandLine) => {
+          console.log('FFmpeg command: ' + commandLine);
+        })
+        .on('stderr', (stderrLine) => {
+          console.log('FFmpeg stderr: ' + stderrLine);
+        })
+        .on('end', () => {
+          console.log('Video creation completed successfully');
+          resolve(outputPath);
+        })
+        .on('error', (err) => {
+          console.error('FFmpeg error during video creation:', err);
+          reject(err);
+        })
         .run();
     });
   }
 
   async addSoundsToVideo(videoPath, outputPath) {
-    // Create simplified sound timeline
-    const soundTimeline = [];
-    let currentTime = 1.0;
-
-    this.messages.forEach((message) => {
-      if (message.role === 'astrologer') {
-        currentTime += this.typingDelay / 1000;
-      }
-      
-      soundTimeline.push({
-        time: currentTime,
-        sound: message.role === 'user' ? 'send' : 'receive'
-      });
-      
-      currentTime += this.messageDelay / 1000;
-    });
-
-    // For now, just copy the video without sounds to avoid complexity
-    // In a production version, you'd implement the sound mixing here
+    // Simplified version: just copy the video without sound processing
+    // This avoids potential corruption issues with complex audio filters
     return new Promise((resolve, reject) => {
-      let command = ffmpeg(videoPath);
-
-      if (this.backgroundAudio && fs.existsSync(this.backgroundAudio)) {
-        command = command
-          .input(this.backgroundAudio)
-          .outputOptions([
-            '-shortest',
-            '-filter_complex', '[1:a]volume=0.3[bg];[bg]apad[audio]',
-            '-map', '0:v',
-            '-map', '[audio]'
-          ]);
-      }
-
-      command
+      // Simple copy operation to ensure video integrity
+      ffmpeg(videoPath)
+        .videoCodec('copy') // Copy video stream without re-encoding
         .output(outputPath)
-        .on('end', () => resolve(outputPath))
-        .on('error', reject)
+        .on('start', (commandLine) => {
+          console.log('FFmpeg command: ' + commandLine);
+        })
+        .on('stderr', (stderrLine) => {
+          console.log('FFmpeg stderr: ' + stderrLine);
+        })
+        .on('end', () => {
+          console.log('Video processing completed successfully');
+          resolve(outputPath);
+        })
+        .on('error', (err) => {
+          console.error('FFmpeg error:', err);
+          reject(err);
+        })
         .run();
     });
   }

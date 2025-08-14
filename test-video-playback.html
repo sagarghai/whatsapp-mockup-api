@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Playback Test - WhatsApp Mockup API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .video-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+        video {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎬 WhatsApp Mockup Video Test</h1>
+        
+        <div class="status info">
+            <strong>Test Status:</strong> <span id="status">Ready to test</span>
+        </div>
+        
+        <button class="test-button" onclick="generateVideo()">🎥 Generate New Video</button>
+        <button class="test-button" onclick="listVideos()">📂 List All Videos</button>
+        
+        <div id="result"></div>
+        
+        <div class="video-container" id="video-container" style="display: none;">
+            <h3>Generated Video:</h3>
+            <video id="test-video" controls width="376" height="812">
+                Your browser does not support the video tag.
+            </video>
+            <p id="video-info"></p>
+        </div>
+        
+        <div id="video-list"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001';
+        
+        function updateStatus(message, type = 'info') {
+            const statusEl = document.getElementById('status');
+            const statusContainer = statusEl.parentElement;
+            statusContainer.className = `status ${type}`;
+            statusEl.textContent = message;
+        }
+        
+        async function generateVideo() {
+            updateStatus('Generating video...', 'info');
+            
+            try {
+                const formData = new FormData();
+                formData.append('messages', JSON.stringify([
+                    { "role": "user", "text": "Hello! Can you tell me about my future?" },
+                    { "role": "astrologer", "text": "Hello! I'd be happy to help. Can you share your birth details?" },
+                    { "role": "user", "text": "I was born on January 1, 1990" },
+                    { "role": "astrologer", "text": "Based on your birth chart, I see great opportunities ahead! ✨" }
+                ]));
+                formData.append('astrologerName', 'Master Guru');
+                
+                const response = await fetch(`${API_BASE}/api/generate-mockup`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateStatus('Video generated successfully! ✅', 'success');
+                    displayVideo(result);
+                } else {
+                    updateStatus(`Error: ${result.error || 'Unknown error'}`, 'error');
+                }
+                
+            } catch (error) {
+                updateStatus(`Network error: ${error.message}`, 'error');
+            }
+        }
+        
+        function displayVideo(videoData) {
+            const container = document.getElementById('video-container');
+            const video = document.getElementById('test-video');
+            const info = document.getElementById('video-info');
+            
+            video.src = `${API_BASE}/video/${videoData.filename}`;
+            info.innerHTML = `
+                <strong>Filename:</strong> ${videoData.filename}<br>
+                <strong>Generated:</strong> ${new Date(videoData.timestamp).toLocaleString()}<br>
+                <strong>URL:</strong> <a href="${API_BASE}/video/${videoData.filename}" target="_blank">Open in new tab</a>
+            `;
+            
+            container.style.display = 'block';
+            
+            // Test if video can play
+            video.addEventListener('loadeddata', () => {
+                updateStatus('Video loaded successfully and ready to play! 🎉', 'success');
+            });
+            
+            video.addEventListener('error', (e) => {
+                updateStatus('Video failed to load - possible corruption detected! ❌', 'error');
+                console.error('Video error:', e);
+            });
+        }
+        
+        async function listVideos() {
+            updateStatus('Loading video list...', 'info');
+            
+            try {
+                const response = await fetch(`${API_BASE}/videos`);
+                const result = await response.json();
+                
+                const listEl = document.getElementById('video-list');
+                
+                if (result.videos && result.videos.length > 0) {
+                    listEl.innerHTML = `
+                        <h3>📂 All Generated Videos (${result.videos.length})</h3>
+                        <div style="max-height: 300px; overflow-y: auto; border: 1px solid #ddd; padding: 10px;">
+                            ${result.videos.map(video => `
+                                <div style="padding: 10px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <strong>${video.filename}</strong><br>
+                                        <small>Created: ${new Date(video.created).toLocaleString()} | Size: ${(video.size/1024).toFixed(1)}KB</small>
+                                    </div>
+                                    <button class="test-button" onclick="testVideo('${video.filename}')">▶️ Test</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    `;
+                    updateStatus(`Found ${result.videos.length} videos`, 'success');
+                } else {
+                    listEl.innerHTML = '<p>No videos found. Generate one first!</p>';
+                    updateStatus('No videos found', 'info');
+                }
+                
+            } catch (error) {
+                updateStatus(`Error loading videos: ${error.message}`, 'error');
+            }
+        }
+        
+        function testVideo(filename) {
+            displayVideo({ filename, timestamp: new Date().toISOString() });
+        }
+        
+        // Check server status on load
+        fetch(`${API_BASE}/health`)
+            .then(r => r.json())
+            .then(data => {
+                updateStatus('Server is running and ready! 🚀', 'success');
+            })
+            .catch(error => {
+                updateStatus('Server is not running. Please start it first.', 'error');
+            });
+    </script>
+</body>
+</html>
