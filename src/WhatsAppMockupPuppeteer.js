@@ -4,6 +4,7 @@ const ffmpegPath = require('ffmpeg-static');
 const fs = require('fs');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
+const SoundManager = require('./SoundManager');
 
 ffmpeg.setFfmpegPath(ffmpegPath);
 
@@ -19,6 +20,9 @@ class WhatsAppMockupPuppeteer {
     this.fps = 30;
     this.messageDelay = 2000;
     this.typingDelay = 1000;
+    
+    // Initialize sound manager
+    this.soundManager = new SoundManager();
   }
 
   generateHTML(messages, showTyping = false, messageOpacity = 1) {
@@ -527,28 +531,43 @@ class WhatsAppMockupPuppeteer {
   }
 
   async addSoundsToVideo(videoPath, outputPath) {
-    // Simple copy operation with both video and audio streams
-    return new Promise((resolve, reject) => {
-      ffmpeg(videoPath)
-        .videoCodec('copy') // Copy video stream without re-encoding
-        .audioCodec('copy') // Copy audio stream without re-encoding
-        .output(outputPath)
-        .on('start', (commandLine) => {
-          console.log('FFmpeg command: ' + commandLine);
-        })
-        .on('stderr', (stderrLine) => {
-          console.log('FFmpeg stderr: ' + stderrLine);
-        })
-        .on('end', () => {
-          console.log('Video processing completed successfully');
-          resolve(outputPath);
-        })
-        .on('error', (err) => {
-          console.error('FFmpeg error:', err);
-          reject(err);
-        })
-        .run();
-    });
+    try {
+      console.log('Adding iOS WhatsApp-style sounds to video...');
+      
+      // Create sound timeline based on messages
+      const soundTimeline = this.soundManager.createSoundTimeline(
+        this.messages,
+        this.messageDelay,
+        this.typingDelay
+      );
+      
+      console.log('Sound timeline created:', soundTimeline);
+      
+      // Use SoundManager to add sounds to video
+      return await this.soundManager.addSoundsToVideo(
+        videoPath,
+        outputPath,
+        soundTimeline,
+        this.backgroundAudio
+      );
+      
+    } catch (error) {
+      console.error('Error adding sounds to video:', error);
+      // Fall back to simple copy if sound processing fails
+      console.log('Falling back to simple video copy...');
+      return new Promise((resolve, reject) => {
+        ffmpeg(videoPath)
+          .videoCodec('copy')
+          .audioCodec('copy')
+          .output(outputPath)
+          .on('end', () => {
+            console.log('Video processing completed (fallback)');
+            resolve(outputPath);
+          })
+          .on('error', reject)
+          .run();
+      });
+    }
   }
 }
 
