@@ -1,184 +1,165 @@
-# WhatsApp Chat Mockup API
+# Growth Tools Backend
 
-A Node.js API that generates realistic WhatsApp chat mockup videos with message animations, sound effects, and background audio.
+Backend API for Growth Tools - AI-powered content generation platform with WhatsApp mockups and slideshow generation.
 
 ## Features
 
-- 📱 Realistic iPhone WhatsApp UI mockup
-- 🎬 Message-by-message slideshow experience
-- 🔊 Apple WhatsApp-style notification sounds
-- 🎵 Background audio support
-- 👤 Custom astrologer profile images
-- 📝 JSON-based message configuration
-- 🎥 MP4 video output
+### 🎬 WhatsApp Mockup Generator
+- Generate realistic WhatsApp chat mockup videos
+- Custom astrologer profiles and conversations  
+- Background audio and image support
+- Automated video export
 
-## Installation
+### 🖼️ AI Slideshow Generator
+- Create slideshow videos from text prompts
+- AI-powered image generation using Replicate FLUX Schnell
+- Optional background audio support
+- Synchronous and asynchronous generation modes
+- Cost-effective at ~$0.003 per image
 
+## API Endpoints
+
+### WhatsApp Mockup API
+- `POST /api/generate-mockup` - Generate WhatsApp chat mockup video
+
+### AI Slideshow API  
+- `GET /api/slideshow/docs` - API documentation
+- `POST /api/slideshow/generate` - Synchronous slideshow generation
+- `POST /api/slideshow/generate-async` - Asynchronous slideshow generation
+- `GET /api/slideshow/job/:jobId` - Check job status or download video
+- `GET /api/slideshow/jobs` - List all jobs (debug)
+
+### System
+- `GET /health` - Health check for both services
+- `GET /videos` - List generated videos
+- `GET /video/:filename` - Download specific video
+
+## Tech Stack
+
+- **Node.js** - Runtime environment
+- **Express.js** - Web framework
+- **Replicate API** - AI image generation
+- **FFmpeg** - Video processing
+- **Puppeteer** - WhatsApp mockup rendering
+- **Canvas** - Image manipulation
+- **Multer** - File upload handling
+
+## Setup
+
+1. **Clone and Install**
+   ```bash
+   git clone <repository>
+   cd growth-tools-backend
+   npm install
+   ```
+
+2. **Environment Variables**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API tokens
+   ```
+
+   Required variables:
+   ```env
+   REPLICATE_API_TOKEN=your_replicate_token_here
+   PORT=3000
+   ```
+
+3. **Start Server**
+   ```bash
+   npm start
+   # or for development
+   npm run dev
+   ```
+
+## API Usage Examples
+
+### Generate Slideshow (Sync)
 ```bash
-cd whatsapp-mockup-api
-npm install
+curl -X POST http://localhost:3000/api/slideshow/generate \
+  -H 'Content-Type: application/json' \
+  -d '{"slides":["sunset over mountains","peaceful lake","forest path"]}' \
+  --output slideshow.mp4
 ```
 
-## Usage
-
-### Start the Server
-
+### Generate Slideshow (Async)
 ```bash
-npm start
+# Start generation
+curl -X POST http://localhost:3000/api/slideshow/generate-async \
+  -H 'Content-Type: application/json' \
+  -d '{"slides":["sunset over mountains","peaceful lake"]}'
+
+# Check status (returns job info or video file when ready)
+curl -X GET http://localhost:3000/api/slideshow/job/{jobId}
 ```
 
-The server will run on `http://localhost:3000` (or set PORT environment variable)
-
-### API Endpoint
-
-**POST** `/api/generate-mockup`
-
-**Content-Type:** `multipart/form-data`
-
-**Parameters:**
-- `messages` (required): JSON string containing chat messages
-- `astrologerName` (optional): Name of the astrologer (default: "Astrologer")
-- `astrologerImage` (optional): Profile image file for the astrologer
-- `backgroundAudio` (optional): Background audio file (will be mixed at 30% volume)
-
-### Message Format
-
-```json
-{
-  "messages": [
-    {
-      "role": "user",
-      "text": "Hello, I wanted to ask about my career prospects"
-    },
-    {
-      "role": "astrologer",
-      "text": "I'd be happy to help! Can you share your birth details?"
-    }
-  ]
-}
-```
-
-### Example Request (cURL)
-
+### Generate WhatsApp Mockup
 ```bash
-# Basic example - returns JSON with auto-generated filename
 curl -X POST http://localhost:3000/api/generate-mockup \
-  -F 'messages=[{"role":"user","text":"Hello"},{"role":"astrologer","text":"Hi there!"}]' \
-  -F 'astrologerName=Guru Acharya' \
-  -F 'astrologerImage=@./astrologer.jpg' \
-  -F 'backgroundAudio=@./background.mp3'
-
-# Response:
-# {
-#   "success": true,
-#   "message": "Video generated successfully",
-#   "filename": "whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
-#   "path": "output/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
-#   "timestamp": "2025-08-14T08:41:23.156Z"
-# }
+  -F 'messages=[{"sender":"user","text":"Hello!"},{"sender":"astrologer","text":"Hi there!"}]' \
+  -F 'astrologerName=Mystic Maya'
 ```
 
-### Download Generated Video
+## Dependencies
 
-```bash
-# Download by filename (from API response)
-curl -O http://localhost:3000/video/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4
+### Core
+- `express` - Web framework
+- `cors` - Cross-origin resource sharing
+- `multer` - File upload middleware
 
-# Or list all generated videos
-curl http://localhost:3000/videos
-```
+### AI & Media Processing  
+- `replicate` - AI image generation API
+- `fluent-ffmpeg` - Video processing
+- `ffmpeg-static` - Static FFmpeg binary
+- `puppeteer` - Headless browser for mockups
+- `canvas` - Server-side image manipulation
 
-### Testing
-
-Run the included test script:
-
-```bash
-node test-api.js
-```
-
-## Technical Details
-
-### Dependencies
-- **Express**: Web server framework
-- **Canvas**: HTML5 Canvas API for Node.js (UI rendering)
-- **FFmpeg**: Video processing and audio mixing
-- **Multer**: File upload handling
-
-### Video Specifications
-- Resolution: 376x812 (Instagram-compatible iPhone dimensions)
-- Frame Rate: 30 FPS
-- Codec: H.264 Main Profile (QuickTime compatible)
-- Format: MP4 with AAC audio
-- Message Timing: 2 seconds between messages
-- Typing Indicator: 1 second for astrologer messages
-- Theme: WhatsApp Light Mode with iOS keyboard
-
-### Sound Effects
-- Send Sound: 800Hz tone, 0.1s duration
-- Receive Sound: 600Hz tone, 0.15s duration
-- Background Audio: Mixed at 30% volume
+### Utilities
+- `fs-extra` - Enhanced file system operations
+- `uuid` - Unique ID generation
+- `axios` - HTTP client
+- `form-data` - Form data handling
 
 ## File Structure
 
 ```
-whatsapp-mockup-api/
-├── server.js                 # Main server file
-├── src/
-│   ├── WhatsAppMockup.js     # Core mockup generator
-│   └── SoundManager.js       # Audio processing
-├── test/
-│   └── sample-data.json      # Test data
-├── test-api.js               # API test script
-├── temp/                     # Temporary files (auto-created)
-├── output/                   # Generated videos (auto-created)
-└── assets/sounds/            # Generated sound effects (auto-created)
+src/
+├── WhatsAppMockup.js           # WhatsApp mockup logic
+├── WhatsAppMockupPuppeteer.js  # Puppeteer-based rendering
+└── SoundManager.js             # Audio handling
+
+assets/sounds/                  # Audio assets
+temp/                          # Temporary files
+output/                        # Generated videos
 ```
 
-## Requirements
+## Cost Estimation
 
-- Node.js 14+
-- FFmpeg (automatically installed via ffmpeg-static)
-- Canvas dependencies (may require system libraries on some platforms)
+### Slideshow Generation
+- ~$0.003 per image (FLUX Schnell model)
+- 5-slide video = ~$0.015
+- 10-slide video = ~$0.03
 
-## API Endpoints
+Very cost-effective for high-quality AI-generated content!
 
-### POST `/api/generate-mockup`
-Generates a WhatsApp mockup video and returns JSON with video details.
+## Deployment
 
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Video generated successfully",
-  "filename": "whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
-  "path": "output/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
-  "timestamp": "2025-08-14T08:41:23.156Z"
-}
-```
+1. **Environment Setup**
+   - Ensure all environment variables are configured
+   - Install FFmpeg on production server
 
-### GET `/video/:filename`
-Streams/downloads a specific generated video.
+2. **Process Management**
+   - Use PM2 or similar for production
+   - Set up proper logging and monitoring
 
-### GET `/videos`
-Lists all generated videos with metadata.
+3. **Scaling Considerations**
+   - File cleanup runs automatically (10min for temp, 1hr for videos)
+   - Consider Redis for job storage in multi-instance setup
+   - Monitor Replicate API usage and limits
 
-### GET `/health`
-Server health check endpoint.
+## Contributing
 
-## Error Handling
-
-The API returns appropriate HTTP status codes:
-- `200`: Success - returns JSON with video details
-- `400`: Bad Request - missing required parameters
-- `500`: Server Error - video generation failed
-
-## Performance Notes
-
-- Video generation time depends on message count and length
-- Large astrologer images are automatically resized
-- Temporary files are cleaned up after video generation
-- Background audio is automatically mixed and synchronized
-
-## License
-
-MIT License
+1. Follow existing code patterns
+2. Add proper error handling
+3. Update API documentation
+4. Test both sync and async endpoints
