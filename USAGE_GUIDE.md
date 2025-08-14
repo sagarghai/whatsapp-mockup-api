@@ -11,7 +11,7 @@ npm install
 ```bash
 npm start
 ```
-Server runs on `http://localhost:3001` (or set PORT environment variable)
+Server runs on `http://localhost:3000` (or set PORT environment variable)
 
 ### 3. Create a Chat Video
 
@@ -19,7 +19,7 @@ Server runs on `http://localhost:3001` (or set PORT environment variable)
 
 **Example cURL Request (Basic):**
 ```bash
-curl -X POST http://localhost:3001/api/generate-mockup \
+curl -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[
     {"role":"user","text":"Hello, I wanted to ask about my career prospects this year"},
     {"role":"astrologer","text":"Namaste! I would be happy to help you with your career reading. Can you please share your birth details?"},
@@ -41,12 +41,12 @@ curl -X POST http://localhost:3001/api/generate-mockup \
 **Download the Generated Video:**
 ```bash
 # Use the filename from the API response
-curl -O http://localhost:3001/video/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4
+curl -O http://localhost:3000/video/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4
 ```
 
 **With Astrologer Image:**
 ```bash
-curl -X POST http://localhost:3001/api/generate-mockup \
+curl -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[{"role":"user","text":"Hello"},{"role":"astrologer","text":"Namaste! How can I help you today?"}]' \
   -F 'astrologerName=Guru Acharya' \
   -F 'astrologerImage=@/path/to/astrologer-photo.jpg'
@@ -54,7 +54,7 @@ curl -X POST http://localhost:3001/api/generate-mockup \
 
 **With Background Audio:**
 ```bash
-curl -X POST http://localhost:3001/api/generate-mockup \
+curl -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[{"role":"user","text":"Thank you for the reading!"},{"role":"astrologer","text":"You are most welcome! Blessings! 🙏"}]' \
   -F 'astrologerName=Guru Acharya' \
   -F 'backgroundAudio=@/path/to/peaceful-music.mp3'
@@ -179,7 +179,7 @@ Here's a complete astrology consultation example:
 
 ### Common Issues
 
-1. **Server not starting**: Check if port 3001 is available (or set PORT environment variable)
+1. **Server not starting**: Check if port 3000 is available (or set PORT environment variable)
 2. **Video generation fails**: Ensure FFmpeg is properly installed via ffmpeg-static
 3. **Image upload errors**: Check file size and format (max 10MB, JPG/PNG only)
 4. **Video playback issues**: Videos are optimized for QuickTime and web browsers
@@ -213,7 +213,7 @@ formData.append('messages', JSON.stringify([
 formData.append('astrologerName', 'Guru Acharya');
 
 // Generate video
-const response = await axios.post('http://localhost:3001/api/generate-mockup', formData, {
+const response = await axios.post('http://localhost:3000/api/generate-mockup', formData, {
   headers: formData.getHeaders()
 });
 
@@ -222,7 +222,7 @@ const { filename } = response.data;
 console.log('Video generated:', filename);
 
 // Download the video
-const videoResponse = await axios.get(`http://localhost:3001/video/${filename}`, {
+const videoResponse = await axios.get(`http://localhost:3000/video/${filename}`, {
   responseType: 'stream'
 });
 
@@ -242,7 +242,7 @@ files = {
 }
 
 response = requests.post(
-    'http://localhost:3001/api/generate-mockup', 
+    'http://localhost:3000/api/generate-mockup', 
     files=files
 )
 
@@ -252,7 +252,7 @@ filename = result['filename']
 print(f"Video generated: {filename}")
 
 # Download the video
-video_response = requests.get(f'http://localhost:3001/video/{filename}')
+video_response = requests.get(f'http://localhost:3000/video/{filename}')
 
 with open(filename, 'wb') as f:
     f.write(video_response.content)

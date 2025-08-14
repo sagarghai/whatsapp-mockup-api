@@ -27,7 +27,7 @@ npm install
 npm start
 ```
 
-The server will run on `http://localhost:3001` (or set PORT environment variable)
+The server will run on `http://localhost:3000` (or set PORT environment variable)
 
 ### API Endpoint
 
@@ -62,7 +62,7 @@ The server will run on `http://localhost:3001` (or set PORT environment variable
 
 ```bash
 # Basic example - returns JSON with auto-generated filename
-curl -X POST http://localhost:3001/api/generate-mockup \
+curl -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[{"role":"user","text":"Hello"},{"role":"astrologer","text":"Hi there!"}]' \
   -F 'astrologerName=Guru Acharya' \
   -F 'astrologerImage=@./astrologer.jpg' \
@@ -82,10 +82,10 @@ curl -X POST http://localhost:3001/api/generate-mockup \
 
 ```bash
 # Download by filename (from API response)
-curl -O http://localhost:3001/video/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4
+curl -O http://localhost:3000/video/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4
 
 # Or list all generated videos
-curl http://localhost:3001/videos
+curl http://localhost:3000/videos
 ```
 
 ### Testing

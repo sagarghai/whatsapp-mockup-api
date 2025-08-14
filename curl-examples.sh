@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # WhatsApp Mockup API - cURL Examples
-# Make sure the server is running: PORT=3001 npm start
+# Make sure the server is running: npm start
 
 echo "🚀 WhatsApp Mockup API Test Examples"
 echo "===================================="
@@ -16,7 +16,7 @@ download_video() {
   
   if [ -n "$filename" ]; then
     echo "📥 Downloading video: $filename"
-    curl -s -o "$example_name.mp4" "http://localhost:3001/video/$filename"
+    curl -s -o "$example_name.mp4" "http://localhost:3000/video/$filename"
     echo "✅ Saved as: $example_name.mp4"
   else
     echo "❌ Failed to extract filename from response"
@@ -27,7 +27,7 @@ download_video() {
 
 # Example 1: Basic chat without images
 echo "📱 Example 1: Basic astrology consultation chat"
-response=$(curl -s -X POST http://localhost:3001/api/generate-mockup \
+response=$(curl -s -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[
     {"role":"user","text":"Hello, I wanted to ask about my career prospects this year"},
     {"role":"astrologer","text":"Namaste! I would be happy to help you with your career reading. Can you please share your birth details?"},
@@ -42,7 +42,7 @@ download_video "$response" "example1-basic-consultation"
 
 # Example 2: Short motivational chat
 echo "📱 Example 2: Short motivational reading"
-response=$(curl -s -X POST http://localhost:3001/api/generate-mockup \
+response=$(curl -s -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[
     {"role":"user","text":"I am feeling very confused about my life direction"},
     {"role":"astrologer","text":"I understand your confusion. The planets are currently in transition, which often brings uncertainty."},
@@ -56,7 +56,7 @@ download_video "$response" "example2-motivational"
 
 # Example 3: Relationship advice
 echo "📱 Example 3: Relationship guidance chat"
-response=$(curl -s -X POST http://localhost:3001/api/generate-mockup \
+response=$(curl -s -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[
     {"role":"user","text":"Can you tell me about my love life this year?"},
     {"role":"astrologer","text":"Of course! Venus is beautifully placed in your 7th house of relationships."},
@@ -70,7 +70,7 @@ download_video "$response" "example3-relationship"
 
 # Example 4: Health consultation  
 echo "📱 Example 4: Health and wellness guidance"
-response=$(curl -s -X POST http://localhost:3001/api/generate-mockup \
+response=$(curl -s -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[
     {"role":"user","text":"I have been having health issues lately. What do the stars say?"},
     {"role":"astrologer","text":"I see Mars is affecting your 6th house of health. This can create inflammation and energy imbalances."},
@@ -85,7 +85,7 @@ download_video "$response" "example4-health"
 
 # Example 5: Success story testimonial
 echo "📱 Example 5: Success story testimonial"
-response=$(curl -s -X POST http://localhost:3001/api/generate-mockup \
+response=$(curl -s -X POST http://localhost:3000/api/generate-mockup \
   -F 'messages=[
     {"role":"user","text":"I wanted to thank you! Your prediction about my job came true!"},
     {"role":"astrologer","text":"That is wonderful news! I am so happy for you. Which prediction was it?"},
@@ -100,7 +100,7 @@ download_video "$response" "example5-testimonial"
 
 # Health check
 echo "🔍 Server Health Check"
-curl -X GET http://localhost:3001/health
+curl -X GET http://localhost:3000/health
 
 echo ""
 echo ""
@@ -112,4 +112,4 @@ echo "💡 Tip: You can add -F 'astrologerImage=@./path/to/image.jpg' to include
 echo "🎵 Tip: You can add -F 'backgroundAudio=@./path/to/music.mp3' for background audio"
 echo ""
 echo "📋 List all videos on server:"
-echo "curl http://localhost:3001/videos"
+echo "curl http://localhost:3000/videos"
