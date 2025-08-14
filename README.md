@@ -27,7 +27,7 @@ npm install
 npm start
 ```
 
-The server will run on `http://localhost:3000`
+The server will run on `http://localhost:3001` (or set PORT environment variable)
 
 ### API Endpoint
 
@@ -61,12 +61,31 @@ The server will run on `http://localhost:3000`
 ### Example Request (cURL)
 
 ```bash
-curl -X POST http://localhost:3000/api/generate-mockup \
+# Basic example - returns JSON with auto-generated filename
+curl -X POST http://localhost:3001/api/generate-mockup \
   -F 'messages=[{"role":"user","text":"Hello"},{"role":"astrologer","text":"Hi there!"}]' \
   -F 'astrologerName=Guru Acharya' \
   -F 'astrologerImage=@./astrologer.jpg' \
-  -F 'backgroundAudio=@./background.mp3' \
-  --output mockup.mp4
+  -F 'backgroundAudio=@./background.mp3'
+
+# Response:
+# {
+#   "success": true,
+#   "message": "Video generated successfully",
+#   "filename": "whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
+#   "path": "output/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
+#   "timestamp": "2025-08-14T08:41:23.156Z"
+# }
+```
+
+### Download Generated Video
+
+```bash
+# Download by filename (from API response)
+curl -O http://localhost:3001/video/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4
+
+# Or list all generated videos
+curl http://localhost:3001/videos
 ```
 
 ### Testing
@@ -86,11 +105,13 @@ node test-api.js
 - **Multer**: File upload handling
 
 ### Video Specifications
-- Resolution: 375x812 (iPhone dimensions)
+- Resolution: 376x812 (Instagram-compatible iPhone dimensions)
 - Frame Rate: 30 FPS
-- Codec: H.264 (MP4)
+- Codec: H.264 Main Profile (QuickTime compatible)
+- Format: MP4 with AAC audio
 - Message Timing: 2 seconds between messages
 - Typing Indicator: 1 second for astrologer messages
+- Theme: WhatsApp Light Mode with iOS keyboard
 
 ### Sound Effects
 - Send Sound: 800Hz tone, 0.1s duration
@@ -119,10 +140,35 @@ whatsapp-mockup-api/
 - FFmpeg (automatically installed via ffmpeg-static)
 - Canvas dependencies (may require system libraries on some platforms)
 
+## API Endpoints
+
+### POST `/api/generate-mockup`
+Generates a WhatsApp mockup video and returns JSON with video details.
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "Video generated successfully",
+  "filename": "whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
+  "path": "output/whatsapp-mockup-2025-08-14T08-41-23-156Z-abc123.mp4",
+  "timestamp": "2025-08-14T08:41:23.156Z"
+}
+```
+
+### GET `/video/:filename`
+Streams/downloads a specific generated video.
+
+### GET `/videos`
+Lists all generated videos with metadata.
+
+### GET `/health`
+Server health check endpoint.
+
 ## Error Handling
 
 The API returns appropriate HTTP status codes:
-- `200`: Success - returns MP4 video
+- `200`: Success - returns JSON with video details
 - `400`: Bad Request - missing required parameters
 - `500`: Server Error - video generation failed
 

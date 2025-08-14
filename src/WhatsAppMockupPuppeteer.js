@@ -491,11 +491,21 @@ class WhatsAppMockupPuppeteer {
       ffmpeg()
         .input(`${framesDir}/frame-%06d.png`)
         .inputOptions(['-framerate', this.fps.toString()])
+        // Add silent audio track for QuickTime compatibility
+        .input('anullsrc=channel_layout=stereo:sample_rate=44100')
+        .inputOptions(['-f', 'lavfi'])
         .videoCodec('libx264')
+        .audioCodec('aac')
         .outputOptions([
           '-pix_fmt', 'yuv420p',
+          '-profile:v', 'main',  // Use Main profile instead of High for better compatibility
+          '-level', '3.1',       // Specify H.264 level
           '-crf', '23',
-          '-movflags', '+faststart' // Optimize for web playback
+          '-movflags', '+faststart', // Optimize for web playback
+          '-shortest',           // Match video length to shortest input
+          '-ac', '2',            // Stereo audio
+          '-ar', '44100',        // 44.1kHz sample rate
+          '-b:a', '128k'         // Audio bitrate
         ])
         .output(outputPath)
         .on('start', (commandLine) => {
@@ -517,12 +527,11 @@ class WhatsAppMockupPuppeteer {
   }
 
   async addSoundsToVideo(videoPath, outputPath) {
-    // Simplified version: just copy the video without sound processing
-    // This avoids potential corruption issues with complex audio filters
+    // Simple copy operation with both video and audio streams
     return new Promise((resolve, reject) => {
-      // Simple copy operation to ensure video integrity
       ffmpeg(videoPath)
         .videoCodec('copy') // Copy video stream without re-encoding
+        .audioCodec('copy') // Copy audio stream without re-encoding
         .output(outputPath)
         .on('start', (commandLine) => {
           console.log('FFmpeg command: ' + commandLine);
